@@ -36,6 +36,26 @@ class TestHTMLNode(unittest.TestCase):
             "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",
         )
 
+    def test_to_html_without_tag_should_raise(self):
+        with self.assertRaises(ValueError):
+            node = ParentNode(
+                None,  # type: ignore[arg-type]
+                [
+                    LeafNode("b", "Bold text"),
+                ],
+            )
+
+            node.to_html()
+
+    def test_to_html_without_children_should_raise(self):
+        with self.assertRaises(ValueError):
+            node = ParentNode(
+                "p",
+                [],
+            )
+
+            node.to_html()
+
 
 if __name__ == "__main__":
     unittest.main()
