@@ -24,3 +24,6 @@ class HTMLNode:
             output.append(f"{item}={self.props[item]}")
         
         return " ".join(output)
+    
+    def __repr__(self):
+        return f"HTMLNode({self.tag}, {self.value})"
