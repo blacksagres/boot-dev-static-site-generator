@@ -1,3 +1,5 @@
+import json
+
 class HTMLNode: 
     def __init__(self, 
                  tag: str | None = None, 
@@ -8,3 +10,17 @@ class HTMLNode:
         self.value = value
         self.children = children
         self.props = props
+
+    def to_html(self):
+        raise NotImplementedError()
+    
+    def props_to_html(self):
+        if self.props is None or len(self.props) == 0:
+            return ""
+        
+        output = []
+
+        for item in self.props:
+            output.append(f"{item}={self.props[item]}")
+        
+        return " ".join(output)
