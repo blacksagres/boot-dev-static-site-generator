@@ -17,8 +17,8 @@ def text_node_to_html_node(text_node: TextNode):
                 "a", text_node.text, {"href": text_node.url} if text_node.url else None
             )
         case TextType.IMAGE:
-            return LeafNode(
-                "img", text_node.text, {"src": text_node.url} if text_node.url else None
-            )
+            normalized_src = text_node.url if text_node.url else ""
+
+            return LeafNode("img", "", {"src": normalized_src, "alt": text_node.text})
 
     raise ValueError(f"{text_node.text_type} this text type is not supported.")
