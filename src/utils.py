@@ -1,5 +1,6 @@
 from leafnode import LeafNode
 from textnode import TextNode, TextType
+import re
 
 
 def text_node_to_html_node(text_node: TextNode):
@@ -87,5 +88,30 @@ def split_nodes_delimiter(
     # find last index of delimiter
     # split on delimiter
     # text in between becomes the new node
+
+    return result
+
+
+def extract_markdown_images(text: str):
+    """
+    Checks a string for markdown image links and extracts those
+    into a tuple.
+
+    :param text: The string to be checked
+    :type text: str
+    """
+
+    markdown_image_descriptions = re.findall(r"\!\[(.*?)\]", text)
+    markdown_image_urls = re.findall(r"\((.*?)\)", text)
+
+    if len(markdown_image_descriptions) != len(markdown_image_urls):
+        raise IndexError(
+            "There is a malformed markdown image url in this string, please fix it."
+        )
+
+    result = []
+
+    for index in range(len(markdown_image_descriptions)):
+        result.append((markdown_image_descriptions[index], markdown_image_urls[index]))
 
     return result

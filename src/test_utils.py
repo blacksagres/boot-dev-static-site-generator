@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import split_nodes_delimiter, text_node_to_html_node
+from utils import extract_markdown_images, split_nodes_delimiter, text_node_to_html_node
 
 
 class TestUtils(unittest.TestCase):
@@ -49,4 +49,24 @@ class TestUtils(unittest.TestCase):
                 TextNode(" word", TextType.TEXT),
             ],
             new_nodes,
+        )
+
+    # extract_markdown_images
+
+    def test_extract_markdown_images_raises_if_markdown_malformed(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan]"
+
+        with self.assertRaises(IndexError):
+            extract_markdown_images(text)
+
+    def test_extract_markdown_images_retrieves_correct_amount(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_images(text)
+
+        self.assertEqual(
+            result,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
         )
