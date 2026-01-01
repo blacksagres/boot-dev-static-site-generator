@@ -24,7 +24,9 @@ def text_node_to_html_node(text_node: TextNode):
     raise ValueError(f"{text_node.text_type} this text type is not supported.")
 
 
-def split_nodes_delimiter(text: list[TextNode], delimiter: str, text_type: TextType):
+def split_nodes_delimiter(
+    old_nodes: list[TextNode], delimiter: str, text_type: TextType
+):
     """
     Creates {TextNode} from string.
 
@@ -45,9 +47,9 @@ def split_nodes_delimiter(text: list[TextNode], delimiter: str, text_type: TextT
 
     ```
 
-    :param text: A list of text nodes which will be checked
+    :param old_nodes: A list of text nodes which will be checked
     for their delimiter.
-    :type text: str
+    :type old_nodes: str
 
     :param delimiter: The delimiter to split the text up,
     for example code: '`', bold: `**`, etc.
@@ -57,4 +59,9 @@ def split_nodes_delimiter(text: list[TextNode], delimiter: str, text_type: TextT
     text nodes to be split.
     """
 
-    raise NotImplementedError()
+    delimiter_in_node = [node for node in old_nodes if delimiter in node.text]
+
+    if not delimiter_in_node:
+        raise ValueError("The delimiter indicated was not found in the list of nodes.")
+
+    return []
