@@ -64,4 +64,28 @@ def split_nodes_delimiter(
     if not delimiter_in_node:
         raise ValueError("The delimiter indicated was not found in the list of nodes.")
 
-    return []
+    result = []
+
+    for node in old_nodes:
+        if node.text.count(delimiter) % 2 > 0:
+            raise ValueError("Found an open delimiter in the text, invalid markdown.")
+
+        # odd indexed items are the ones that contain text between delimiters.
+
+        split_node_text = node.text.split(delimiter)
+
+        for child_node_text in split_node_text:
+            between_delimiter = split_node_text.index(child_node_text) % 2 == 1
+
+            text_node_to_append = TextNode(
+                child_node_text, text_type if between_delimiter else TextType.TEXT
+            )
+
+            result.append(text_node_to_append)
+
+    # find first index of delimiter
+    # find last index of delimiter
+    # split on delimiter
+    # text in between becomes the new node
+
+    return result

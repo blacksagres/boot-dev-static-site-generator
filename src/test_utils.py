@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import text_node_to_html_node
+from utils import split_nodes_delimiter, text_node_to_html_node
 
 
 class TestUtils(unittest.TestCase):
@@ -32,3 +32,21 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(ValueError):
             split_nodes_delimiter([node], "impossible_delimiter", TextType.CODE)
 
+    def test_split_nodes_delimiter_raises_if_delimiter_not_closed(self):
+        # the code here is not closed - missing delimiter
+        node = TextNode("This is text with a `code block word", TextType.TEXT)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([node], "`", TextType.CODE)
+
+    def test_split_nodes_delimiter_processes_code_node(self):
+        node = TextNode("This is text with a `code block` word", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
+
+        self.assertEqual(
+            [
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" word", TextType.TEXT),
+            ],
+            new_nodes,
+        )
