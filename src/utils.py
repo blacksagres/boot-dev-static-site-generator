@@ -115,3 +115,28 @@ def extract_markdown_images(text: str):
         result.append((markdown_image_descriptions[index], markdown_image_urls[index]))
 
     return result
+
+
+def extract_markdown_links(text: str):
+    """
+    Checks a string for markdown links and extracts those
+    into a tuple.
+
+    :param text: The string to be checked
+    :type text: str
+    """
+
+    markdown_link_descriptions = re.findall(r"\[(.*?)\]", text)
+    markdown_link_urls = re.findall(r"\((.*?)\)", text)
+
+    if len(markdown_link_descriptions) != len(markdown_link_urls):
+        raise IndexError(
+            "There is a malformed markdown link url in this string, please fix it."
+        )
+
+    result = []
+
+    for index in range(len(markdown_link_descriptions)):
+        result.append((markdown_link_descriptions[index], markdown_link_urls[index]))
+
+    return result

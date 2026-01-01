@@ -1,7 +1,12 @@
 import unittest
 
 from textnode import TextNode, TextType
-from utils import extract_markdown_images, split_nodes_delimiter, text_node_to_html_node
+from utils import (
+    extract_markdown_images,
+    extract_markdown_links,
+    split_nodes_delimiter,
+    text_node_to_html_node,
+)
 
 
 class TestUtils(unittest.TestCase):
@@ -62,6 +67,26 @@ class TestUtils(unittest.TestCase):
     def test_extract_markdown_images_retrieves_correct_amount(self):
         text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
         result = extract_markdown_images(text)
+
+        self.assertEqual(
+            result,
+            [
+                ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
+            ],
+        )
+
+    # extract_markdown_links
+
+    def test_extract_markdown_links_raises_if_markdown_malformed(self):
+        text = "This is text with a [rick roll](https://i.imgur.com/aKaOqIh.gif) and [obi wan]"
+
+        with self.assertRaises(IndexError):
+            extract_markdown_links(text)
+
+    def test_extract_markdown_links_retrieves_correct_amount(self):
+        text = "This is text with a [rick roll](https://i.imgur.com/aKaOqIh.gif) and [obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        result = extract_markdown_links(text)
 
         self.assertEqual(
             result,
