@@ -179,3 +179,42 @@ def split_nodes_image(old_nodes: list[TextNode]):
             result.append(text_node)
 
     return result
+
+
+def split_nodes_link(old_nodes: list[TextNode]):
+    result: list[TextNode] = []
+
+    image_link_delimiter = "["
+
+    for text_node in old_nodes:
+        current_text = text_node.text
+
+        if image_link_delimiter in current_text:
+            markdown_image_links = extract_markdown_links(current_text)
+
+            for alt, url in markdown_image_links:
+                image_md = f"[{alt}]({url})"
+
+                """
+                By splitting this just once we are absolutely sure of where to 
+                insert the link text between the text.
+
+                If we end up with an empty `before`, this means that 
+                the link was split in the beginning of the string.
+                """
+                before, after = current_text.split(image_md, 1)
+
+                if before:
+                    result.append(TextNode(before, TextType.TEXT))
+
+                result.append(TextNode(alt, TextType.LINK, url))
+
+                current_text = after
+
+            if current_text:
+                result.append(TextNode(current_text, TextType.TEXT))
+
+        else:
+            result.append(text_node)
+
+    return result
