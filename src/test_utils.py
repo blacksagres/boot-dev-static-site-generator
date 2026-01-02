@@ -5,6 +5,7 @@ from utils import (
     extract_markdown_images,
     extract_markdown_links,
     split_nodes_delimiter,
+    split_nodes_image,
     text_node_to_html_node,
 )
 
@@ -94,4 +95,24 @@ class TestUtils(unittest.TestCase):
                 ("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
                 ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg"),
             ],
+        )
+
+    # split_nodes_image
+
+    def test_split_nodes_image_generates_correct_nodes(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode(
+                    "second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"
+                ),
+            ],
+            new_nodes,
         )
