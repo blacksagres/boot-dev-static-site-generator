@@ -18,7 +18,7 @@ def markdown_to_blocks(markdown: str) -> list[str]:
     Splits a markdown string into separate blocks.
 
     Blocks are separated by blank lines. Leading and trailing
-    whitespace is stripped from each block.
+    whitespace is stripped from each block and from each line within blocks.
 
     :param markdown: The markdown string to split into blocks
     :type markdown: str
@@ -31,9 +31,13 @@ def markdown_to_blocks(markdown: str) -> list[str]:
     # Strip whitespace from each block and filter out empty blocks
     result = []
     for block in blocks:
+        # Strip leading/trailing whitespace from the block
         stripped_block = block.strip()
         if stripped_block:
-            result.append(stripped_block)
+            # Also strip leading/trailing whitespace from each line within the block
+            lines = [line.strip() for line in stripped_block.split("\n")]
+            cleaned_block = "\n".join(lines)
+            result.append(cleaned_block)
 
     return result
 
