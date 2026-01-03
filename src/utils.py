@@ -3,6 +3,23 @@ from textnode import TextNode, TextType
 import re
 
 
+def text_to_text_nodes(text: str):
+    result: list[TextNode] = []
+
+    initial_text_node = TextNode(text, TextType.TEXT)
+
+    result = split_nodes_delimiter([initial_text_node], "**", TextType.BOLD)
+
+    result = split_nodes_delimiter(result, "_", TextType.ITALIC)
+
+    result = split_nodes_delimiter(result, "`", TextType.CODE)
+
+    result = split_nodes_image(result)
+    result = split_nodes_link(result)
+
+    return result
+
+
 def text_node_to_html_node(text_node: TextNode):
     match text_node.text_type:
         case TextType.TEXT:
@@ -27,7 +44,7 @@ def text_node_to_html_node(text_node: TextNode):
 
 def split_nodes_delimiter(
     old_nodes: list[TextNode], delimiter: str, text_type: TextType
-):
+) -> list[TextNode]:
     """
     Creates {TextNode} from string.
 
@@ -65,7 +82,7 @@ def split_nodes_delimiter(
     if not delimiter_in_node:
         raise ValueError("The delimiter indicated was not found in the list of nodes.")
 
-    result = []
+    result: list[TextNode] = []
 
     for node in old_nodes:
         if node.text.count(delimiter) % 2 > 0:
@@ -79,7 +96,7 @@ def split_nodes_delimiter(
             between_delimiter = split_node_text.index(child_node_text) % 2 == 1
 
             text_node_to_append = TextNode(
-                child_node_text, text_type if between_delimiter else TextType.TEXT
+                child_node_text, text_type if between_delimiter else node.text_type
             )
 
             result.append(text_node_to_append)
@@ -104,10 +121,10 @@ def extract_markdown_images(text: str):
     markdown_image_descriptions = re.findall(r"\!\[(.*?)\]", text)
     markdown_image_urls = re.findall(r"\((.*?)\)", text)
 
-    if len(markdown_image_descriptions) != len(markdown_image_urls):
-        raise IndexError(
-            "There is a malformed markdown image url in this string, please fix it."
-        )
+    # if len(markdown_image_descriptions) != len(markdown_image_urls):
+    #     raise IndexError(
+    #         "There is a malformed markdown image url in this string, please fix it."
+    #     )
 
     result = []
 
