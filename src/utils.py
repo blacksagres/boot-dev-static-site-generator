@@ -3,6 +3,31 @@ from textnode import TextNode, TextType
 import re
 
 
+def markdown_to_blocks(markdown: str) -> list[str]:
+    """
+    Splits a markdown string into separate blocks.
+
+    Blocks are separated by blank lines. Leading and trailing
+    whitespace is stripped from each block.
+
+    :param markdown: The markdown string to split into blocks
+    :type markdown: str
+    :return: A list of markdown blocks
+    :rtype: list[str]
+    """
+    # Split on double newlines (blank lines)
+    blocks = markdown.split("\n\n")
+
+    # Strip whitespace from each block and filter out empty blocks
+    result = []
+    for block in blocks:
+        stripped_block = block.strip()
+        if stripped_block:
+            result.append(stripped_block)
+
+    return result
+
+
 def text_to_text_nodes(text: str):
     result: list[TextNode] = []
 
