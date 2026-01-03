@@ -2,6 +2,8 @@ import unittest
 
 from textnode import TextNode, TextType
 from utils import (
+    BlockType,
+    block_to_block_type,
     extract_markdown_images,
     extract_markdown_links,
     markdown_to_blocks,
@@ -201,3 +203,88 @@ def test_markdown_to_blocks(self):
             "- This is a list\n- with items",
         ],
     )
+    # block_to_block_type
+
+    def test_block_to_block_type_paragraph(self):
+        block = "This is a simple paragraph"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_paragraph_multiline(self):
+        block = "This is a paragraph\nwith multiple lines\nthat don't match any pattern"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_heading_h1(self):
+        block = "# This is a heading"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+
+    def test_block_to_block_type_heading_h2(self):
+        block = "## This is a level 2 heading"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+
+    def test_block_to_block_type_heading_h6(self):
+        block = "###### This is a level 6 heading"
+        self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+
+    def test_block_to_block_type_heading_no_space_is_paragraph(self):
+        block = "#This is not a heading"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_heading_too_many_hashes_is_paragraph(self):
+        block = "####### This is not a heading"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_code(self):
+        block = "```\nprint('hello')\nprint('world')\n```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+
+    def test_block_to_block_type_code_single_line(self):
+        block = "```code```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+
+    def test_block_to_block_type_quote_single_line(self):
+        block = ">This is a quote"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+
+    def test_block_to_block_type_quote_multiline(self):
+        block = ">This is a quote\n>with multiple lines\n>all starting with >"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+
+    def test_block_to_block_type_quote_missing_one_is_paragraph(self):
+        block = ">This is a quote\nthis line doesn't start with >\n>but this does"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_unordered_list_single_item(self):
+        block = "- Item one"
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_unordered_list_multiple_items(self):
+        block = "- Item one\n- Item two\n- Item three"
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_unordered_list_missing_space_is_paragraph(self):
+        block = "-Item without space"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_unordered_list_missing_one_is_paragraph(self):
+        block = "- Item one\nItem two\n- Item three"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_ordered_list_single_item(self):
+        block = "1. First item"
+        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+
+    def test_block_to_block_type_ordered_list_multiple_items(self):
+        block = "1. First item\n2. Second item\n3. Third item"
+        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+
+    def test_block_to_block_type_ordered_list_wrong_start_is_paragraph(self):
+        block = "2. Second item\n3. Third item"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_ordered_list_skip_number_is_paragraph(self):
+        block = "1. First item\n3. Third item"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_ordered_list_missing_space_is_paragraph(self):
+        block = "1.First item"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)

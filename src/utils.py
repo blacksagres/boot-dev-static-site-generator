@@ -1,6 +1,16 @@
 from leafnode import LeafNode
 from textnode import TextNode, TextType
 import re
+from enum import Enum
+
+
+class BlockType(Enum):
+    PARAGRAPH = "paragraph"
+    HEADING = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    UNORDERED_LIST = "unordered_list"
+    ORDERED_LIST = "ordered_list"
 
 
 def markdown_to_blocks(markdown: str) -> list[str]:
@@ -26,6 +36,50 @@ def markdown_to_blocks(markdown: str) -> list[str]:
             result.append(stripped_block)
 
     return result
+
+
+def block_to_block_type(block: str) -> BlockType:
+    """
+    Determines the type of a markdown block.
+
+    :param block: A single block of markdown text (already stripped)
+    :type block: str
+    :return: The BlockType of the block
+    :rtype: BlockType
+    """
+    lines = block.split("\n")
+
+    # Check for heading (1-6 # followed by space)
+    if block.startswith(("#", "##", "###", "####", "#####", "######")):
+        parts = block.split(" ", 1)
+        if len(parts) == 2 and parts[0] in [
+            "#",
+            "##",
+            "###",
+            "####",
+            "#####",
+            "######",
+        ]:
+            return BlockType.HEADING
+
+    # Check for code block (starts and ends with ```)
+    if block.startswith("```") and block.endswith("```"):
+        return BlockType.CODE
+
+    # Check for quote block (every line starts with >)
+    if all(line.startswith(">") for line in lines):
+        return BlockType.QUOTE
+
+    # Check for unordered list (every line starts with "- ")
+    if all(line.startswith("- ") for line in lines):
+        return BlockType.UNORDERED_LIST
+
+    # Check for ordered list (every line starts with number. and space, incrementing from 1)
+    if all(line.startswith(f"{i}. ") for i, line in enumerate(lines, start=1)):
+        return BlockType.ORDERED_LIST
+
+    # Default to paragraph
+    return BlockType.PARAGRAPH
 
 
 def text_to_text_nodes(text: str):
